@@ -10,9 +10,9 @@ app = Flask(__name__)
 @app.route('/city/coordinates/<city_name>', methods=['GET'])
 def get_coordinates(city_name):
     url = f"{GEOCODING_API_ENDPOINT}?q={city_name}&appid={API_KEY}"
-    # response = requests.get(url)
-    # response = response.json()
-    response = DIRECT_GEOCODING
+    response = requests.get(url)
+    response = response.json()
+    # response = DIRECT_GEOCODING
 
     if not response:
         return jsonify({})
@@ -24,9 +24,9 @@ def get_coordinates(city_name):
 def get_forecast(lat, lon, number_of_days):
     number_of_days = int(number_of_days)
     url = f"{FORECAST_API_ENDPOINT}?lat={lat}&lon={lon}&appid={API_KEY}"
-    # response = requests.get(url)
-    # response = response.json()
-    response = FORECAST
+    response = requests.get(url)
+    response = response.json()
+    # response = FORECAST
     days_report = response['list']
     result = []
     days_report.insert(0, {})
@@ -36,7 +36,6 @@ def get_forecast(lat, lon, number_of_days):
             result.append(days_report[index])
 
     result = result[1:number_of_days + 1]
-
     return result
 
 

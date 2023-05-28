@@ -39,14 +39,15 @@ def main():
     if not coordinates:
         raise ValueError("Couldn't fetch the coordinates of the city")
 
-    # weather_forecast = get_forecast(coordinates['lat'], coordinates['lon'], args.number_of_days)
-    weather_forecast = None
+    if not args.get_farming_predictions:
+        weather_forecast = get_forecast(coordinates['lat'], coordinates['lon'], args.number_of_days)
+    else:
+        weather_forecast = None
+
     if not args.get_farming_predictions:
         _render_content(weather_forecast, args.number_of_days)
     else:
         _get_farming_predictions(weather_forecast, args.city_name)
-
-
 
 
 if __name__ == '__main__':
