@@ -20,22 +20,27 @@ def get_coordinates(city_name):
     return jsonify(response[0])
 
 
-@app.route('/city/forecast/<lat>/<lon>/<number_of_days>', methods=['GET'])
-def get_forecast(lat, lon, number_of_days):
+@app.route('/city/forecast/<lat>/<lon>/<number_of_days>/<interval>', methods=['GET'])
+def get_forecast(lat, lon, number_of_days, interval):
     number_of_days = int(number_of_days)
+    interval = int(interval)
     url = f"{FORECAST_API_ENDPOINT}?lat={lat}&lon={lon}&appid={API_KEY}"
     response = requests.get(url)
     response = response.json()
     # response = FORECAST
     days_report = response['list']
     result = []
-    days_report.insert(0, {})
+    limit = 5 if number_of_days == 1 else 99999
 
-    for index in range(len(days_report) + 1):
-        if index and index % 8 == 0 or index == 1:
-            result.append(days_report[index])
+    if number_of_days == 1:
+        result = days_report[:limit + 1]
+    else:
+        for index in range(len(days_report)):
+            if index and index % interval == 0 or index == 1 or interval == 1:
+                result.append(days_report[index])
 
-    result = result[1:number_of_days + 1]
+        result = result[1:number_of_days + 1]
+
     return result
 
 

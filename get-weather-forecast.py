@@ -8,6 +8,7 @@ def parse_options():
     my_parser.add_argument('-c', '--city-name', type=str, required=False, help="Name of the city")
     my_parser.add_argument('-n', '--number-of-days', type=str, required=False, help="Get the forecast details for the next `N` days. Specify the value of `N` here")
     my_parser.add_argument('-G', '--get-farming-predictions', action='store_true')
+    my_parser.add_argument('-t', '--interval', action='store_true')
 
     return my_parser.parse_args()
 
@@ -22,8 +23,8 @@ def get_coordinates(city_name):
     return response
 
 
-def get_forecast(lat, lon, number_of_days):
-    url = f"{SERVER_ENDPOINT}/city/forecast/{lat}/{lon}/{number_of_days}"
+def get_forecast(lat, lon, number_of_days, interval):
+    url = f"{SERVER_ENDPOINT}/city/forecast/{lat}/{lon}/{number_of_days}/{interval}"
     status_code, response = _send_request(url, method="GET")
 
     if not check_status(status_code):
@@ -39,13 +40,20 @@ def main():
     if not coordinates:
         raise ValueError("Couldn't fetch the coordinates of the city")
 
+    if not args.number_of_days:
+        number_of_days = 1
+        interval = 1
+    else:
+        number_of_days = int(args.number_of_days)
+        interval = 8
+
     if not args.get_farming_predictions:
-        weather_forecast = get_forecast(coordinates['lat'], coordinates['lon'], args.number_of_days)
+        weather_forecast = get_forecast(coordinates['lat'], coordinates['lon'], number_of_days, interval)
     else:
         weather_forecast = None
 
     if not args.get_farming_predictions:
-        _render_content(weather_forecast, args.number_of_days)
+        _render_content(weather_forecast, number_of_days)
     else:
         _get_farming_predictions(weather_forecast, args.city_name)
 
